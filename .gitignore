@@ -91,3 +91,4 @@ sw.*
 
 db.json
 .vscode/
+.now

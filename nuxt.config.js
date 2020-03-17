@@ -46,9 +46,11 @@ module.exports = {
   /*
    ** Nuxt.js dev-modules
    */
-  buildModules: ['@nuxtjs/tailwindcss'],
-  tailwindcss: {
-    whitelistPatterns: [/^el-*/, /^CodeMirror*/]
+  buildModules: ['@nuxtjs/tailwindcss', 'nuxt-purgecss'],
+  purgeCSS: {
+    mode: 'postcss',
+    whitelistPatterns: [/el-*/, /cm-s-vscode-dark*/, /^CodeMirror*/],
+    whitelistPatternsChildren: [/el-*/, /cm-s-vscode-dark*/, /^CodeMirror*/]
   },
   /*
    ** Nuxt.js modules
@@ -69,5 +71,9 @@ module.exports = {
    */
   build: {
     transpile: [/^element-ui/]
-  }
+  },
+  serverMiddleware: [
+    // API middleware
+    '~/api/index.js'
+  ]
 }
