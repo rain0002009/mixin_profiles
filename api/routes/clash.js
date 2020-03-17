@@ -128,10 +128,8 @@ router.post('/updateMyProfile', async ({
   body
 }, res) => {
   try {
-    const {
-      myProfileLink,
-      profiles
-    } = body
+    const myProfileLink = body.myProfileLink
+    const profiles = body.profiles
     if (!Array.isArray(profiles) || profiles.length === 0) {
       return res.status(500).send('配置列表为空')
     }
