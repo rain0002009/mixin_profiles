@@ -27,7 +27,6 @@
   },
   "devDependencies": {
     "@nuxtjs/tailwindcss": "^1.4.0",
-    "nodemon": "^1.18.9",
     "sass": "^1.26.3",
     "sass-loader": "^8.0.2"
   }
