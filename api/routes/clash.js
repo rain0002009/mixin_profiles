@@ -39,7 +39,9 @@ router.get('/profile', async ({
   let fileContent = hasCurrentUser(query.key, 'fileContent')
   try {
     fileContent = await createProfile(currentUser.value())
-  } catch (e) {}
+  } catch (e) {
+    res.sendStatus(500)
+  }
   res.send(fileContent.value())
 })
 
@@ -66,6 +68,9 @@ function mixinProxyGroup(targetGroup, sourceGroup) {
 
 // 根据源数据生成profile文件
 async function createProfile(list) {
+  if (!Array.isArray(list) || list.length === 0) {
+    throw new Error('list 为空')
+  }
   let file = ''
   let newProfile = {
     Proxy: [],

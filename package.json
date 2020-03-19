@@ -1,7 +1,7 @@
 {
   "name": "nuxt",
   "version": "1.0.0",
-  "description": "My fine Nuxt.js project",
+  "description": "Clash profile mixin",
   "author": "rain0002009",
   "private": true,
   "scripts": {
@@ -9,7 +9,7 @@
     "build": "nuxt build",
     "start": "nuxt start",
     "generate": "nuxt generate",
-    "heroku-postbuild": "npm run build"
+    "heroku-postbuild": "yarn run build"
   },
   "dependencies": {
     "@nuxtjs/axios": "^5.3.6",
