@@ -89,6 +89,6 @@ sw.*
 # Vim swap files
 *.swp
 
-storage/
+storage/db.json
 .vscode/
 .now
