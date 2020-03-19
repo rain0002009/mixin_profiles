@@ -1,3 +1,4 @@
+const path = require('path')
 const _ = require('lodash')
 const yaml = require('js-yaml')
 const crypto = require('crypto')
@@ -43,6 +44,10 @@ router.get('/profile', async ({
     res.sendStatus(500)
   }
   res.send(fileContent.value())
+})
+
+router.get('/getDB', (req, res) => {
+  res.sendFile(path.resolve(__dirname, '.', '../../storage/db.json'))
 })
 
 //api:获取用户配置列表
@@ -156,7 +161,6 @@ router.post('/updateMyProfile', async ({
       fileContent
     }).write()
     const newData = db.get(`userProfiles[${key}]`).value()
-    console.log(newData)
     if (!newData) {
       return res.status(500).send('写入数据失败')
     }
