@@ -4,7 +4,7 @@ const yaml = require('js-yaml')
 const crypto = require('crypto')
 const axios = require('axios')
 const axiosInstance = axios.create({
-  timeout: 5000
+  timeout: 100000
 })
 axiosInstance.interceptors.response.use(function (response) {
   return response.data
@@ -19,12 +19,11 @@ const router = Router()
 
 
 function getParams(target = '', key) {
-  try {
-    const url = new URL(target)
-    return url.searchParams.get(key)
-  } catch (e) {
+  if (!target) {
     return null
   }
+  const url = new URL(target)
+  return url.searchParams.get(key)
 }
 
 function hasCurrentUser(key, path = '') {
@@ -37,13 +36,13 @@ router.get('/profile', async ({
   query
 }, res) => {
   const currentUser = hasCurrentUser(query.key, 'source')
-  let fileContent = hasCurrentUser(query.key, 'fileContent')
+  let fileContent = hasCurrentUser(query.key, 'fileContent').value()
   try {
     fileContent = await createProfile(currentUser.value())
   } catch (e) {
     res.sendStatus(500)
   }
-  res.send(fileContent.value())
+  res.send(fileContent)
 })
 
 router.get('/getDB', (req, res) => {
@@ -54,9 +53,28 @@ router.get('/getDB', (req, res) => {
 router.get('/getMyProfile', ({
   query
 }, res) => {
+  try {
+    const key = getParams(query.link, 'key')
+    const data = hasCurrentUser(key, 'source').value()
+    return data ? res.json(data) : res.status(500).send('没有该订阅地址')
+  } catch (e) {
+    res.status(500).send(e.message)
+  }
+})
+
+//api: 用户删除配置
+router.delete('/deleteProfile', ({
+  query
+}, res) => {
   const key = getParams(query.link, 'key')
-  const data = hasCurrentUser(key, 'source').value()
-  return data ? res.json(data) : res.status(500).send('没有该订阅地址')
+  const data = hasCurrentUser(key).value()
+  if (key && data) {
+    db.unset(`userProfiles[${key}]`).write()
+    return res.json({
+      message: '已成功删除'
+    })
+  }
+  res.status(500).send('删除失败')
 })
 
 function mixinProxyGroup(targetGroup, sourceGroup) {

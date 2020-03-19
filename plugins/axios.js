@@ -1,8 +1,17 @@
 export default function ({
-  $axios,
-  redirect
+  $axios
 }) {
+  const noopLoading = {
+    finish: () => {},
+    start: () => {},
+    fail: () => {},
+    set: () => {}
+  }
+  const $loading = () => (window.$nuxt && window.$nuxt.$loading && window.$nuxt.$loading.set) ? window.$nuxt.$loading : noopLoading
   $axios.setHeader('Cache-Control', 'no-cache')
+  $axios.onRequest((config) => {
+    $loading().start()
+  })
   // 响应返回处理
   $axios.onResponse((response) => {
     return response.data

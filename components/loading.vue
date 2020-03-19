@@ -4,7 +4,9 @@ import { Loading } from 'element-ui'
 export default {
   data() {
     return {
-      loading: {}
+      loading: {
+        close() {}
+      }
     }
   },
   methods: {
@@ -17,7 +19,8 @@ export default {
     },
     finish() {
       this.loading.close()
-    }
+    },
+    set() {}
   }
 }
 </script>

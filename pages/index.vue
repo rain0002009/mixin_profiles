@@ -43,6 +43,7 @@
             <el-button type="primary" @click="addProfile('link')">添加一个订阅</el-button>
             <el-button type="success" @click="addProfile('file')">添加配置文件</el-button>
             <el-button type="primary" @click="submit">提交</el-button>
+            <el-button type="danger" @click="deleteProfile">删除</el-button>
           </el-form-item>
         </el-form>
       </el-card>
@@ -81,7 +82,7 @@ export default {
     async getMyProfile() {
       try {
         const data = await this.$axios.get('/getMyProfile', {
-          params: { link: this.userData.myProfileLink }
+          params: { link: encodeURI(this.userData.myProfileLink) }
         })
         this.userData.profiles = data
         this.saveToLocal()
@@ -95,17 +96,31 @@ export default {
     deleteProfile(index) {
       this.userData.profiles.splice(index, 1)
     },
+    async deleteProfile() {
+      try {
+        await this.$confirm('一旦删除将无法找回', '警告')
+        const { message } = await this.$axios.delete('/deleteProfile', {
+          params: { link: encodeURI(this.userData.myProfileLink) }
+        })
+        this.$message.success(message)
+        localforage.removeItem('userData')
+        this.userData = { myProfileLink: '', profiles: [] }
+        this.$message.success('已清楚本地缓存')
+      } catch (e) {
+        typeof e === 'object' && this.$message.error(e.message)
+      }
+    },
     submit() {
       this.$refs.form.validate(async valid => {
         if (valid) {
           try {
+            this.$message.info('请耐心等待')
             const { message, key } = await this.$axios.post(
               '/updateMyProfile',
               this.userData
             )
             this.userData.myProfileLink =
-              location.host + '/api/profile?key=' + key
-
+              location.origin + '/api/profile?key=' + key
             this.saveToLocal()
           } catch (e) {
             this.$message.error(e.message)
@@ -119,6 +134,3 @@ export default {
   }
 }
 </script>
-
-<style lang="scss">
-</style>
