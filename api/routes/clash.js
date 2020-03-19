@@ -155,6 +155,11 @@ router.post('/updateMyProfile', async ({
       source: profiles,
       fileContent
     }).write()
+    const newData = db.get(`userProfiles[${key}]`).value()
+    console.log(newData)
+    if (!newData) {
+      return res.status(500).send('写入数据失败')
+    }
     return res.json({
       key,
       message: '更新成功'
