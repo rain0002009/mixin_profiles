@@ -36,6 +36,7 @@ module.exports = {
    ** Plugins to load before mounting the App
    */
   plugins: [
+    '@/plugins/hotcss',
     '@/plugins/element-ui',
     '@/plugins/axios',
     {
