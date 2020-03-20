@@ -89,6 +89,19 @@ function mixinProxyGroup(targetGroup, sourceGroup) {
   })
 }
 
+function getRuleKey(rule) {
+  return (rule.match(/[\w\-,\./]+(?=,\w+)/g) || [])[0]
+}
+
+function changeRuleToMap(source) {
+  const rules = new Map()
+  source.forEach(item => {
+    const key = getRuleKey(item)
+    rules.set(key, item)
+  })
+  return rules
+}
+
 // 根据源数据生成profile文件
 async function createProfile(list) {
   if (!Array.isArray(list) || list.length === 0) {
@@ -111,12 +124,18 @@ async function createProfile(list) {
       return Promise.resolve('')
     }))
     const newProfileProxyGroup = newProfile['Proxy Group']
-    Object.assign(newProfile, ...profileList.map(item => _.omit(item, ['Proxy', 'Proxy Group', 'Rile'])))
+    Object.assign(newProfile, ...profileList.map(item => _.omit(item, ['Proxy', 'Proxy Group', 'Rule'])))
+    const rules = changeRuleToMap(newProfile.Rule)
     profileList.forEach((profile, index) => {
       newProfile.Proxy = newProfile.Proxy.concat(profile.Proxy)
-      const profileProxyGroup = profile['Proxy Group']
-      mixinProxyGroup(newProfileProxyGroup, profileProxyGroup)
-      newProfile.Rule = newProfile.Rule.concat(profile.Rule)
+      mixinProxyGroup(newProfileProxyGroup, profile['Proxy Group'])
+      profile.Rule.forEach(item => rules.set(getRuleKey(item), item))
+    })
+    // 对规则排序确保MATCH在最后
+    newProfile.Rule = [...rules.values()].sort((a, b) => {
+      const ruleTypes = ['DOMAIN-SUFFIX', 'DOMAIN', 'DOMAIN-KEYWORD', 'IP-CIDR', 'SRC-IP-CIDR', 'GEOIP', 'DST-PORT', 'SRC-PORT', 'MATCH']
+      const getRuleTypeIndex = (key) => ruleTypes.indexOf(key.slice(0, key.indexOf(',')))
+      return getRuleTypeIndex(a) - getRuleTypeIndex(b)
     })
     file = yaml.safeDump(newProfile, {
       noRefs: true
