@@ -1,7 +1,22 @@
 import Vue from 'vue'
-import Element from 'element-ui'
-import locale from 'element-ui/lib/locale/lang/zh-CN'
+import {
+  Button,
+  Container,
+  Header,
+  Main,
+  Card,
+  Form,
+  FormItem,
+  Input,
+  Message
+} from 'element-ui'
 
-Vue.use(Element, {
-  locale
-})
+Vue.use(Button)
+Vue.use(Container)
+Vue.use(Header)
+Vue.use(Main)
+Vue.use(Card)
+Vue.use(Form)
+Vue.use(FormItem)
+Vue.use(Input)
+Vue.prototype.$message = Message

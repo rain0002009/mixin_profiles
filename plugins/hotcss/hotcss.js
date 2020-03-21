@@ -1,4 +1,4 @@
-import _ from 'lodash'
+import throttle from 'lodash/throttle'
 export default {
   install(Vue, options) {
     const hotcss = {
@@ -100,7 +100,7 @@ export default {
       hotcss.callback && hotcss.callback()
     }
     process.client && hotcss.mresize()
-    const handleResize = _.throttle(hotcss.mresize, 300)
+    const handleResize = throttle(hotcss.mresize, 300)
     Vue.mixin({
       created() {
         hotcss.mresize()

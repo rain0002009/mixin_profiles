@@ -31,7 +31,7 @@ module.exports = {
   /*
    ** Global CSS
    */
-  css: ['element-ui/lib/theme-chalk/index.css'],
+  css: [],
   /*
    ** Plugins to load before mounting the App
    */
@@ -47,11 +47,14 @@ module.exports = {
   /*
    ** Nuxt.js dev-modules
    */
-  buildModules: ['@nuxtjs/tailwindcss', 'nuxt-purgecss'],
+  buildModules: ['@nuxtjs/tailwindcss'],
+  tailwindcss: {
+    purgeCSSInDev: true
+  },
   purgeCSS: {
-    mode: 'postcss',
-    whitelistPatterns: [/el-*/, /cm-s-vscode-dark*/, /^CodeMirror*/],
-    whitelistPatternsChildren: [/el-*/, /cm-s-vscode-dark*/, /^CodeMirror*/]
+    // mode: 'postcss',
+    whitelistPatterns: [/^el-*/, /^cm-s-vscode-dark*/, /^CodeMirror*/],
+    whitelistPatternsChildren: [/^el-*/, /^cm-s-vscode-dark*/, /^CodeMirror*/]
   },
   /*
    ** Nuxt.js modules
@@ -71,7 +74,31 @@ module.exports = {
    ** Build configuration
    */
   build: {
-    transpile: [/^element-ui/]
+    transpile: [/^element-ui/],
+    babel: {
+      babelrc: false,
+      cacheDirectory: undefined,
+      presets: ['@nuxt/babel-preset-app'],
+      plugins: [
+        ["component", {
+          "libraryName": "element-ui",
+          "styleLibraryName": "theme-chalk"
+        }]
+      ]
+    },
+    extractCSS: true,
+    optimizeCSS: {
+      assetNameRegExp: /\.optimize\.css$/g,
+      cssProcessor: require('cssnano'),
+      cssProcessorPluginOptions: {
+        preset: ['default', {
+          discardComments: {
+            removeAll: true
+          }
+        }],
+      },
+      canPrint: true
+    }
   },
   serverMiddleware: [
     // API middleware

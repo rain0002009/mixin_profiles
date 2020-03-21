@@ -1,5 +1,6 @@
 const path = require('path')
-const _ = require('lodash')
+const findIndex = require('lodash/findIndex')
+const omit = require('lodash/omit')
 const yaml = require('js-yaml')
 const crypto = require('crypto')
 const axios = require('axios')
@@ -79,7 +80,7 @@ router.delete('/deleteProfile', ({
 
 function mixinProxyGroup(targetGroup, sourceGroup) {
   sourceGroup.forEach(item => {
-    const commonIndex = _.findIndex(targetGroup, ['name', item.name])
+    const commonIndex = findIndex(targetGroup, ['name', item.name])
     if (commonIndex < 0) {
       targetGroup.push(item)
     } else {
@@ -125,7 +126,7 @@ async function createProfile(list) {
     return Promise.resolve('')
   }))
   const newProfileProxyGroup = newProfile['Proxy Group']
-  Object.assign(newProfile, ...profileList.map(item => _.omit(item, ['Proxy', 'Proxy Group', 'Rule'])))
+  Object.assign(newProfile, ...profileList.map(item => omit(item, ['Proxy', 'Proxy Group', 'Rule'])))
   const rules = changeRuleToMap(newProfile.Rule)
   profileList.forEach((profile, index) => {
     newProfile.Proxy = newProfile.Proxy.concat(profile.Proxy)
