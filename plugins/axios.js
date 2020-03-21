@@ -17,9 +17,10 @@ export default function ({
     return response.data
   })
   // 响应错误处理
-  $axios.onResponseError(({
-    response
-  }) => {
+  $axios.onResponseError((error) => {
+    const response = error.response || {
+      data: error
+    }
     return Promise.reject(new Error(response.data))
   })
 }

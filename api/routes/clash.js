@@ -113,37 +113,35 @@ async function createProfile(list) {
     'Proxy Group': [],
     Rule: []
   }
-  try {
-    const profileList = await Promise.all(list.map(item => {
-      if (item.type === 'link') {
-        return axiosInstance.get(item.content).then(res => yaml.safeLoad(res))
-      }
-      if (item.type === 'file') {
-        return Promise.resolve(yaml.safeLoad(item.content))
-      }
-      return Promise.resolve('')
-    }))
-    const newProfileProxyGroup = newProfile['Proxy Group']
-    Object.assign(newProfile, ...profileList.map(item => _.omit(item, ['Proxy', 'Proxy Group', 'Rule'])))
-    const rules = changeRuleToMap(newProfile.Rule)
-    profileList.forEach((profile, index) => {
-      newProfile.Proxy = newProfile.Proxy.concat(profile.Proxy)
-      mixinProxyGroup(newProfileProxyGroup, profile['Proxy Group'])
-      profile.Rule.forEach(item => rules.set(getRuleKey(item), item))
-    })
-    // 对规则排序确保MATCH在最后
-    newProfile.Rule = [...rules.values()].sort((a, b) => {
-      const ruleTypes = ['DOMAIN-SUFFIX', 'DOMAIN', 'DOMAIN-KEYWORD', 'IP-CIDR', 'SRC-IP-CIDR', 'GEOIP', 'DST-PORT', 'SRC-PORT', 'MATCH']
-      const getRuleTypeIndex = (key) => ruleTypes.indexOf(key.slice(0, key.indexOf(',')))
-      return getRuleTypeIndex(a) - getRuleTypeIndex(b)
-    })
-    file = yaml.safeDump(newProfile, {
-      noRefs: true
-    })
-    return file
-  } catch (e) {
-    console.error(e)
-  }
+  const profileList = await Promise.all(list.map(item => {
+    if (item.type === 'link') {
+      return axiosInstance.get(item.content).then(res => yaml.safeLoad(res)).catch(e => {
+        throw new Error(e)
+      })
+    }
+    if (item.type === 'file') {
+      return Promise.resolve(yaml.safeLoad(item.content))
+    }
+    return Promise.resolve('')
+  }))
+  const newProfileProxyGroup = newProfile['Proxy Group']
+  Object.assign(newProfile, ...profileList.map(item => _.omit(item, ['Proxy', 'Proxy Group', 'Rule'])))
+  const rules = changeRuleToMap(newProfile.Rule)
+  profileList.forEach((profile, index) => {
+    newProfile.Proxy = newProfile.Proxy.concat(profile.Proxy)
+    mixinProxyGroup(newProfileProxyGroup, profile['Proxy Group'])
+    profile.Rule.forEach(item => rules.set(getRuleKey(item), item))
+  })
+  // 对规则排序确保MATCH在最后
+  newProfile.Rule = [...rules.values()].sort((a, b) => {
+    const ruleTypes = ['DOMAIN-SUFFIX', 'DOMAIN', 'DOMAIN-KEYWORD', 'IP-CIDR', 'SRC-IP-CIDR', 'GEOIP', 'DST-PORT', 'SRC-PORT', 'MATCH']
+    const getRuleTypeIndex = (key) => ruleTypes.indexOf(key.slice(0, key.indexOf(',')))
+    return getRuleTypeIndex(a) - getRuleTypeIndex(b)
+  })
+  file = yaml.safeDump(newProfile, {
+    noRefs: true
+  })
+  return file
 }
 
 // 获取用户key
@@ -184,13 +182,17 @@ router.post('/updateMyProfile', async ({
     let fileContent = ''
     key = getParams(myProfileLink, 'key')
     const user = hasCurrentUser(key)
-    if (!user.value()) {
-      if (key) {
-        return res.status(500).send('该订阅地址不存在，请删除它并重新提交')
+    try {
+      if (!user.value()) {
+        if (key) {
+          return res.status(500).send('该订阅地址不存在，请删除它并重新提交')
+        }
+        ([key, fileContent] = await Promise.all([createNewUserKey(+new Date()), createProfile(profiles)]))
+      } else {
+        fileContent = await createProfile(profiles)
       }
-      ([key, fileContent] = await Promise.all([createNewUserKey(+new Date()), createProfile(profiles)]))
-    } else {
-      fileContent = await createProfile(profiles)
+    } catch (e) {
+      return res.status(500).send('读取或写入yaml失败，请检查yaml格式是否正确')
     }
 
     db.set(`userProfiles[${key}]`, {

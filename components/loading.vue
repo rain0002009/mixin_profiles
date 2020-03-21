@@ -20,6 +20,9 @@ export default {
     finish() {
       this.loading.close()
     },
+    fail() {
+      this.loading.close()
+    },
     set() {}
   }
 }

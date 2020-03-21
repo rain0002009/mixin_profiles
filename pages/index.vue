@@ -35,7 +35,7 @@
               size="mini"
               icon="el-icon-delete"
               circle
-              @click="deleteProfile(index)"
+              @click="deleteItem(index)"
             ></el-button>
           </el-form-item>
 
@@ -103,7 +103,7 @@ export default {
     addProfile(type) {
       this.userData.profiles.push({ type, content: '' })
     },
-    deleteProfile(index) {
+    deleteItem(index) {
       this.userData.profiles.splice(index, 1)
     },
     async deleteProfile() {
