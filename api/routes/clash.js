@@ -43,7 +43,9 @@ router.get('/profile', async ({
   } catch (e) {
     res.sendStatus(500)
   }
-  res.send(fileContent)
+  res.set({
+    'Content-Type': 'text/x-yaml; charset=utf-8'
+  }).send(fileContent)
 })
 
 router.get('/getDB', (req, res) => {
