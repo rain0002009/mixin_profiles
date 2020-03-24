@@ -44,7 +44,8 @@ router.get('/profile', async ({
     res.sendStatus(500)
   }
   res.set({
-    'Content-Type': 'text/x-yaml; charset=utf-8'
+    'Content-Type': 'text/x-yaml; charset=utf-8',
+    'Cache-Control': 'no-store'
   }).send(fileContent)
 })
 
