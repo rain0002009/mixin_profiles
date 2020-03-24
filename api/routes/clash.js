@@ -45,7 +45,7 @@ router.get('/profile', async ({
   }
   res.set({
     'Content-Type': 'text/x-yaml; charset=utf-8',
-    'Cache-Control': 'no-store'
+    'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0'
   }).send(fileContent)
 })
 
