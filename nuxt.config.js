@@ -6,7 +6,7 @@ const axios = hasSetApi ? {
 } : {
   baseURL
 }
-
+console.log(`proxy: ${hasSetApi}`)
 module.exports = {
   mode: 'universal',
   /*
@@ -71,7 +71,7 @@ module.exports = {
   modules: [
     // Doc: https://axios.nuxtjs.org/usage
     '@nuxtjs/axios',
-    hasSetApi ? '@nuxtjs/proxy' : null,
+    '@nuxtjs/proxy'
   ],
   /*
    ** Axios module configuration
@@ -82,7 +82,6 @@ module.exports = {
     '/api/': {
       target: baseURL,
       changeOrigin: true,
-      debug: true,
       pathRewrite: {
         '^/api/': ''
       }
