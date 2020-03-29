@@ -17,7 +17,7 @@
             v-for="(profile, index) in userData.profiles"
             :key="index"
             :prop="`profiles.${index}.content`"
-            :rules="{required: true, message: '不能为空', trigger: 'blur'}"
+            :rules="{ required: true, message: '不能为空', trigger: 'blur' }"
           >
             <div v-if="profile.type === 'file'">
               <client-only>
@@ -78,6 +78,10 @@ export default {
         return window.innerWidth > 1400 ? '120px' : null
       }
       return null
+    },
+    key() {
+      if (!this.userData.myProfileLink) return null
+      return new URL(this.userData.myProfileLink).searchParams.get('key')
     }
   },
   methods: {
@@ -91,10 +95,8 @@ export default {
     },
     async getMyProfile() {
       try {
-        const data = await this.$axios.get('/getMyProfile', {
-          params: { link: encodeURI(this.userData.myProfileLink) }
-        })
-        this.userData.profiles = data
+        const data = await this.$axios.get(`/clash-users/${this.key}`)
+        this.userData.profiles = data.profiles
         this.saveToLocal()
       } catch (error) {
         this.$message.error(error.message)
@@ -108,11 +110,10 @@ export default {
     },
     async deleteProfile() {
       try {
-        await this.$confirm('一旦删除将无法找回', '警告')
-        const { message } = await this.$axios.delete('/deleteProfile', {
-          params: { link: encodeURI(this.userData.myProfileLink) }
+        await this.$confirm('一旦删除将无法找回', '警告', {
+          closeOnClickModal: false
         })
-        this.$message.success(message)
+        await this.$axios.delete(`/clash-users/${this.key}`)
         localforage.removeItem('userData')
         this.userData = { myProfileLink: '', profiles: [] }
         this.$message.success('已清楚本地缓存')
@@ -124,13 +125,12 @@ export default {
       this.$refs.form.validate(async valid => {
         if (valid) {
           try {
-            this.$message.info('请耐心等待')
-            const { message, key } = await this.$axios.post(
-              '/updateMyProfile',
+            const { name } = await this.$axios.post(
+              '/clash-users',
               this.userData
             )
             this.userData.myProfileLink =
-              location.origin + '/api/profile?key=' + key
+              location.origin + '/api/profile?key=' + name
             this.saveToLocal()
           } catch (e) {
             this.$message.error(e.message)

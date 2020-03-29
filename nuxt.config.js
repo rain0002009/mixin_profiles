@@ -1,3 +1,12 @@
+const baseURL = process.env.apiURL || '/api'
+const hasSetApi = baseURL !== '/api'
+const axios = hasSetApi ? {
+  proxy: true,
+  prefix: '/api'
+} : {
+  baseURL
+}
+
 module.exports = {
   mode: 'universal',
   /*
@@ -36,7 +45,7 @@ module.exports = {
    ** Plugins to load before mounting the App
    */
   plugins: [
-    '@/plugins/hotcss',
+    '@/plugins/hotcss/index.js',
     '@/plugins/element-ui',
     '@/plugins/axios',
     {
@@ -53,23 +62,32 @@ module.exports = {
   },
   purgeCSS: {
     // mode: 'postcss',
-    whitelistPatterns: [/^el-*/, /^cm-s-vscode-dark*/, /^CodeMirror*/],
-    whitelistPatternsChildren: [/^el-*/, /^cm-s-vscode-dark*/, /^CodeMirror*/]
+    whitelistPatterns: [/^el-|v-*/, /^cm-s-vscode-dark*/, /^CodeMirror*/],
+    whitelistPatternsChildren: [/^el-|v-*/, /^cm-s-vscode-dark*/, /^CodeMirror*/]
   },
   /*
    ** Nuxt.js modules
    */
   modules: [
     // Doc: https://axios.nuxtjs.org/usage
-    '@nuxtjs/axios'
+    '@nuxtjs/axios',
+    hasSetApi ? '@nuxtjs/proxy' : null,
   ],
   /*
    ** Axios module configuration
    ** See https://axios.nuxtjs.org/options
    */
-  axios: {
-    baseURL: '/api'
-  },
+  axios,
+  proxy: hasSetApi ? {
+    '/api/': {
+      target: baseURL,
+      changeOrigin: true,
+      debug: true,
+      pathRewrite: {
+        '^/api/': ''
+      }
+    }
+  } : null,
   /*
    ** Build configuration
    */
@@ -102,6 +120,5 @@ module.exports = {
   },
   serverMiddleware: [
     // API middleware
-    '~/api/index.js'
   ]
 }
