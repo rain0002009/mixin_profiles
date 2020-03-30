@@ -1,12 +1,3 @@
-const baseURL = process.env.apiURL || '/api'
-const hasSetApi = baseURL !== '/api'
-const axios = hasSetApi ? {
-  proxy: true,
-  prefix: '/api'
-} : {
-  baseURL
-}
-console.log(`proxy: ${hasSetApi}`)
 module.exports = {
   mode: 'universal',
   /*
@@ -70,23 +61,15 @@ module.exports = {
    */
   modules: [
     // Doc: https://axios.nuxtjs.org/usage
-    '@nuxtjs/axios',
-    '@nuxtjs/proxy'
+    '@nuxtjs/axios'
   ],
   /*
    ** Axios module configuration
    ** See https://axios.nuxtjs.org/options
    */
-  axios,
-  proxy: hasSetApi ? {
-    '/api/': {
-      target: baseURL,
-      changeOrigin: true,
-      pathRewrite: {
-        '^/api/': ''
-      }
-    }
-  } : null,
+  axios: {
+    baseURL: '/api'
+  },
   /*
    ** Build configuration
    */
