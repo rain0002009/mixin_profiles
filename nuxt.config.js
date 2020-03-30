@@ -119,9 +119,6 @@ module.exports = {
   },
   serverMiddleware: [
     // API middleware
-    {
-      path: '/api',
-      handler: '~/api/index.js'
-    }
+    '~/api/index.js'
   ]
 }
