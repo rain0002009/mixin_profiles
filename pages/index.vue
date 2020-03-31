@@ -130,7 +130,7 @@ export default {
               this.userData
             )
             this.userData.myProfileLink =
-              location.origin + '/api/profile?key=' + name
+              location.origin + '/api/clash-users/profile?key=' + name
             this.saveToLocal()
           } catch (e) {
             this.$message.error(e.message)
