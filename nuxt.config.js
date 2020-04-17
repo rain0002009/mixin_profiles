@@ -39,6 +39,7 @@ module.exports = {
     '@/plugins/hotcss/index.js',
     '@/plugins/element-ui',
     '@/plugins/axios',
+    '@/plugins/p5/p5.client.js',
     {
       src: '@/plugins/codemirror',
       mode: 'client'
