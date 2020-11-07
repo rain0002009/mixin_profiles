@@ -57,6 +57,7 @@
 import localforage from 'localforage'
 
 export default {
+  layout: 'hilbert',
   head: {
     title: 'clash配置合并'
   },

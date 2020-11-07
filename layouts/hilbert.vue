@@ -1,5 +1,8 @@
 <template>
   <div class="default-layout">
+    <client-only>
+      <background />
+    </client-only>
     <el-main class="m-auto">
       <nuxt />
     </el-main>
