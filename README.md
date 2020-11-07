@@ -1,6 +1,9 @@
 # nuxt
 
-> My fine Nuxt.js project
+> 一个简单的练手项目
+
+主要功能:
+- 合并多个clash订阅源为一个 （需要[api](https://github.com/rain0002009/my-api )支持）
 
 ## Build Setup
 
